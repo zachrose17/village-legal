@@ -1,6 +1,6 @@
 # Orbit
 
-The app for your inner circle.
+Hang out with your friends more.
 
 - [Privacy Policy](./privacy.html)
 - [Terms of Service](./terms.html)
