@@ -1,6 +1,6 @@
 # Orbit
 
-Hang out with your friends more.
+See your friends more.
 
 - [Privacy Policy](./privacy.html)
 - [Terms of Service](./terms.html)
