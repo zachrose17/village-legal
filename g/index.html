@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Join us on Orbit</title>
+
+  <!-- Link unfurl (static — GitHub Pages can't render per-link previews). -->
+  <meta property="og:title" content="Join us on Orbit" />
+  <meta property="og:description" content="Tap to sign up — everyone who joins from this link gets connected." />
+  <meta property="og:type" content="website" />
+
+  <style>
+    :root {
+      --bg: #fdfaf5;
+      --card: #ffffff;
+      --ink1: #2b2622;
+      --ink2: #6b6157;
+      --ink3: #9a8f83;
+      --hair: rgba(43, 38, 34, 0.10);
+      --accent: #3478c4;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--ink1);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .card {
+      width: 100%;
+      max-width: 380px;
+      background: var(--card);
+      border: 1px solid var(--hair);
+      border-radius: 24px;
+      padding: 28px 24px 24px;
+      box-shadow: 0 12px 40px rgba(43, 38, 34, 0.08);
+      text-align: center;
+    }
+    .wordmark {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--ink3);
+      margin-bottom: 22px;
+    }
+    .avatar {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin: 0 auto 16px;
+      display: block;
+      background: #ece5db;
+      border: 3px solid #fff;
+      box-shadow: 0 4px 14px rgba(43, 38, 34, 0.12);
+    }
+    .avatar.initials {
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px; font-weight: 600; color: var(--ink2);
+    }
+    .host { font-size: 14px; color: var(--ink2); margin: 0 0 4px; }
+    .circle {
+      font-size: 23px; font-weight: 600; line-height: 1.25;
+      color: var(--ink1); margin: 0 0 10px;
+    }
+    .members {
+      font-size: 13px; color: var(--ink3); margin: 0 0 24px;
+      min-height: 16px;
+    }
+    .closed {
+      font-size: 13px; font-weight: 600; color: var(--ink3);
+      background: rgba(43,38,34,0.06); border-radius: 999px;
+      display: inline-block; padding: 5px 12px; margin-bottom: 18px;
+    }
+    .btn {
+      display: block; width: 100%;
+      font-size: 16px; font-weight: 600;
+      padding: 15px; border-radius: 999px;
+      text-decoration: none; border: none; cursor: pointer;
+      transition: transform 0.08s ease;
+    }
+    .btn:active { transform: scale(0.985); }
+    .btn-primary { background: var(--ink1); color: #fff; margin-bottom: 10px; }
+    .btn-secondary {
+      background: transparent; color: var(--ink2);
+      border: 1px solid var(--hair);
+    }
+    .footnote { font-size: 12px; color: var(--ink3); margin: 18px 0 0; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div class="wordmark">Orbit</div>
+    <div id="avatar" class="avatar initials">·</div>
+    <p class="host" id="host">A friend invited you to join their circle</p>
+    <p class="circle" id="circle">Join the group on Orbit</p>
+    <p class="members" id="members"></p>
+    <div id="closed" class="closed" style="display:none;">This link is closed</div>
+
+    <a class="btn btn-primary" id="open" href="#">Open in Orbit</a>
+    <a class="btn btn-secondary" id="get" href="#">Get Orbit</a>
+
+    <p class="footnote">If you have Orbit, this opens the app and connects you with
+      the group. Otherwise, download it first — then open this link again.</p>
+  </main>
+
+  <script>
+    // ── Config ────────────────────────────────────────────────────────────
+    // Where people without the app go. Replace with your live TestFlight or
+    // App Store link.
+    const GET_APP_URL = "https://testflight.apple.com/join/Gm7rhqBQ";
+
+    const SUPABASE_URL = "https://bwjebaulfmwnettkdhcw.supabase.co";
+    // The anon public key is safe to ship in a client — RLS (not this key)
+    // protects data, and group-invite-info returns only display-safe fields.
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ3amViYXVsZm13bmV0dGtkaGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5OTQ4MTgsImV4cCI6MjA5NDU3MDgxOH0.uqz7sVvhUZVDeZNcL3HUJMXW6dAc3hi125D6T9DeutA";
+
+    // ── Read the link ─────────────────────────────────────────────────────
+    const params = new URLSearchParams(location.search);
+    const inviteId = params.get("g") || params.get("id");
+    const previewLabel = params.get("n");   // group label, e.g. "College crew"
+
+    const $ = (id) => document.getElementById(id);
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, (c) =>
+        ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    }
+
+    // App + store buttons.
+    $("get").href = GET_APP_URL;
+    const appUrl = inviteId ? "orbit://join?g=" + encodeURIComponent(inviteId) : null;
+    $("open").href = appUrl || GET_APP_URL;
+
+    // ── Immediate preview from the link's own params ──────────────────────
+    if (previewLabel) $("circle").textContent = previewLabel;
+
+    function setInitials(name) {
+      const a = $("avatar");
+      const initials = (name || "·").trim().split(/\s+/).map(w => w[0]).slice(0, 2).join("").toUpperCase();
+      a.className = "avatar initials";
+      a.textContent = initials || "·";
+    }
+
+    // ── Enrich from group-invite-info (creator, count, label, open/closed) ─
+    async function enrich() {
+      if (!inviteId) return;
+      try {
+        const res = await fetch(SUPABASE_URL + "/functions/v1/group-invite-info", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": SUPABASE_ANON_KEY,
+            "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+          },
+          body: JSON.stringify({ id: inviteId }),
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!data || data.found === false) return;
+
+        const creatorName = data.creator && data.creator.name ? data.creator.name : "A friend";
+        $("host").textContent = creatorName + " invited you to join their circle";
+
+        const label = data.label || previewLabel;
+        if (label) {
+          $("circle").textContent = label;
+        } else {
+          $("circle").textContent = "Join " + creatorName + " on Orbit";
+        }
+
+        if (data.creator && data.creator.avatarURL) {
+          const img = document.createElement("img");
+          img.className = "avatar";
+          img.src = data.creator.avatarURL;
+          img.alt = escapeHtml(creatorName);
+          img.onerror = () => setInitials(creatorName);
+          $("avatar").replaceWith(img);
+          img.id = "avatar";
+        } else {
+          setInitials(creatorName);
+        }
+
+        if (typeof data.memberCount === "number" && data.memberCount > 0) {
+          $("members").textContent = data.memberCount === 1
+            ? "1 person is already in" : data.memberCount + " people are already in";
+        }
+
+        if (data.open === false) {
+          $("closed").style.display = "inline-block";
+        }
+      } catch (_) { /* best-effort; the param preview already rendered */ }
+    }
+    enrich();
+  </script>
+</body>
+</html>
