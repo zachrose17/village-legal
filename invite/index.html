@@ -1,184 +1,215 @@
-<!DOCTYPE html>
-<!--
-  Orbit personalized invite landing page.
-  Served verbatim (no Jekyll front matter) at /orbit-legal/invite/.
-  Reads the `from` query param to say "<inviter> invited you to their Orbit".
-  The optional `i` token is reserved for a future backend that reconciles the
-  connection by inviter; the page works fully without it.
--->
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="robots" content="noindex" />
-  <title>You're invited to Orbit</title>
-  <meta name="theme-color" content="#F7F3ED" />
-  <meta property="og:title" content="You're invited to Orbit" />
-  <meta property="og:description" content="Add them on Orbit to stay in touch." />
+  <title>You've been added to a Village</title>
+  <meta name="color-scheme" content="light dark" />
+
+  <!-- Open Graph: makes the iMessage/SMS link preview look like a real invite. -->
+  <meta property="og:title" content="You've been added to a Village" />
+  <meta property="og:description" content="Village is how friends keep up with each other and make plans. Tap to join." />
+  <meta property="og:type" content="website" />
+
   <style>
     :root {
-      --bg: #F7F3ED;
-      --bg-elevated: #FDFAF5;
-      --ink1: #1F1A17;
-      --ink2: #524A43;
-      --ink3: #7A7168;
-      --hairline: rgba(31, 26, 23, 0.09);
-      --soft: rgba(31, 26, 23, 0.06);
+      --bg: #f6f4ef;
+      --bg-elevated: #ffffff;
+      --ink1: #1b1a17;
+      --ink2: #54514a;
+      --ink3: #8a867c;
+      --hairline: rgba(0,0,0,0.08);
+      --action: #1b1a17;
+      --action-ink: #ffffff;
+      --accent-soft: #efece4;
     }
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    html, body { margin: 0; padding: 0; }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #14130f;
+        --bg-elevated: #1e1c18;
+        --ink1: #f4f1ea;
+        --ink2: #b8b4aa;
+        --ink3: #847f74;
+        --hairline: rgba(255,255,255,0.10);
+        --action: #f4f1ea;
+        --action-ink: #14130f;
+        --accent-soft: #26241f;
+      }
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
     body {
-      min-height: 100svh;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      color: var(--ink1);
       background: var(--bg);
-      background-image:
-        radial-gradient(120% 80% at 80% -10%, rgba(186, 222, 235, 0.55), transparent 60%),
-        radial-gradient(120% 90% at -10% 110%, rgba(205, 226, 196, 0.55), transparent 55%);
+      color: var(--ink1);
+      font: 16px/1.5 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+      -webkit-font-smoothing: antialiased;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 28px 20px calc(28px + env(safe-area-inset-bottom));
+      padding: 24px;
     }
     .card {
       width: 100%;
       max-width: 380px;
       background: var(--bg-elevated);
       border: 1px solid var(--hairline);
-      border-radius: 26px;
-      padding: 34px 26px 28px;
+      border-radius: 28px;
+      padding: 36px 28px 28px;
       text-align: center;
-      box-shadow: 0 24px 60px -28px rgba(31, 26, 23, 0.28);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.08);
     }
-    .rings { width: 96px; height: 96px; margin: 0 auto 22px; display: block; }
-    .eyebrow {
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 1.6px;
-      text-transform: uppercase;
-      color: var(--ink3);
-      margin: 0 0 12px;
+    .avatar {
+      width: 92px; height: 92px;
+      border-radius: 50%;
+      margin: 0 auto 22px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 34px; font-weight: 600;
+      color: #fff;
+      background: #b9a;
+      object-fit: cover;
+      overflow: hidden;
     }
     h1 {
       font-size: 25px;
-      line-height: 1.22;
+      line-height: 1.25;
       font-weight: 600;
-      margin: 0 0 12px;
-      letter-spacing: -0.2px;
+      margin: 0 0 10px;
+      letter-spacing: -0.01em;
     }
-    h1 .name { white-space: nowrap; }
-    p.sub {
-      font-size: 15px;
-      line-height: 1.5;
+    .sub {
       color: var(--ink2);
-      margin: 0 auto 26px;
+      font-size: 15px;
+      margin: 0 auto 28px;
       max-width: 300px;
     }
     .cta {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
+      display: block;
       width: 100%;
-      border: none;
-      cursor: pointer;
-      font-family: inherit;
+      padding: 15px 18px;
+      border-radius: 16px;
+      background: var(--action);
+      color: var(--action-ink);
       font-size: 16px;
       font-weight: 600;
-      color: var(--bg-elevated);
-      background: var(--ink1);
-      padding: 16px 20px;
-      border-radius: 16px;
       text-decoration: none;
-      transition: opacity 0.15s ease;
+      border: none;
+      cursor: pointer;
     }
     .cta:active { opacity: 0.85; }
-    .soon {
-      margin: 14px auto 0;
-      font-size: 13px;
+    .foot {
+      margin: 18px 0 0;
+      font-size: 12.5px;
       color: var(--ink3);
-      max-width: 280px;
-      line-height: 1.45;
-      display: none;
+      line-height: 1.5;
     }
-    .soon.show { display: block; }
-    .footer {
-      margin-top: 26px;
-      padding-top: 18px;
-      border-top: 1px solid var(--hairline);
-      font-size: 12px;
+    .badge {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-size: 12px; font-weight: 600; letter-spacing: 0.04em;
+      text-transform: uppercase;
       color: var(--ink3);
-      line-height: 1.6;
+      margin-bottom: 22px;
     }
-    .footer a { color: var(--ink2); text-decoration: none; }
-    .footer a:hover { text-decoration: underline; }
+    .dot { width: 16px; height: 16px; border-radius: 50%; background: var(--ink1); display:inline-block; }
+    .skeleton { color: transparent; user-select: none; }
+    .skeleton .avatar { background: var(--accent-soft); animation: pulse 1.4s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+    .hidden { display: none; }
   </style>
 </head>
 <body>
-  <main class="card">
-    <svg class="rings" viewBox="0 0 96 96" fill="none" aria-hidden="true">
-      <circle cx="48" cy="48" r="45" stroke="#1F1A17" stroke-opacity="0.10" stroke-width="2" />
-      <circle cx="48" cy="48" r="31" stroke="#1F1A17" stroke-opacity="0.16" stroke-width="2" />
-      <circle cx="48" cy="48" r="17" stroke="#1F1A17" stroke-opacity="0.24" stroke-width="2" />
-      <circle cx="48" cy="48" r="6" fill="#1F1A17" />
-      <circle cx="79" cy="48" r="5" fill="#1F1A17" fill-opacity="0.55" />
-      <circle cx="33" cy="20" r="4.5" fill="#1F1A17" fill-opacity="0.7" />
-    </svg>
-
-    <p class="eyebrow">You're invited</p>
-    <h1 id="headline">You're invited to Orbit</h1>
-    <p class="sub" id="subtext">
-      Orbit makes it easier to casually meet up with friends. Add them to stay in touch.
-    </p>
-
-    <a class="cta" id="cta" href="#" role="button">Get Orbit</a>
-    <p class="soon" id="soon">Orbit is launching soon — get it on the App Store shortly. Hang tight!</p>
-
-    <div class="footer">
-      Orbit — see your friends more.<br />
-      <a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a> · <a href="../support.html">Support</a>
-    </div>
+  <main class="card" id="card" aria-live="polite">
+    <div class="badge"><span class="dot"></span> Village</div>
+    <div class="avatar" id="avatar">·</div>
+    <h1 id="title">Loading your invite…</h1>
+    <p class="sub" id="sub">One sec.</p>
+    <a class="cta" id="cta" href="#">Get Village</a>
+    <p class="foot" id="foot">Village is how friends keep up with each other and make plans.</p>
   </main>
 
   <script>
-    // ----------------------------------------------------------------------
+    // --- Config -------------------------------------------------------------
+    // The anon key is public by design (RLS protects data); safe to ship here.
+    const SUPABASE_URL = "https://bwjebaulfmwnettkdhcw.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ3amViYXVsZm13bmV0dGtkaGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5OTQ4MTgsImV4cCI6MjA5NDU3MDgxOH0.uqz7sVvhUZVDeZNcL3HUJMXW6dAc3hi125D6T9DeutA";
     // Pre-launch: send people to the TestFlight beta. Swap this for the real
-    // App Store listing (https://apps.apple.com/app/orbit/id…) once published.
-    // If ever emptied, the "Get Orbit" button falls back to a "launching soon" note.
-    const APP_URL = "https://testflight.apple.com/join/Gm7rhqBQ";
-    // ----------------------------------------------------------------------
+    // App Store listing (https://apps.apple.com/app/village/id…) once published.
+    const APP_STORE_URL = "https://testflight.apple.com/join/Gm7rhqBQ";
 
-    (function () {
-      const params = new URLSearchParams(window.location.search);
-      const rawFrom = (params.get("from") || "").trim();
-      // Keep it sane: cap length, collapse whitespace. Rendered via textContent
-      // (never innerHTML), so it can't inject markup.
-      const from = rawFrom.replace(/\s+/g, " ").slice(0, 40);
+    // --- Helpers ------------------------------------------------------------
+    const $ = (id) => document.getElementById(id);
+    const token = new URLSearchParams(location.search).get("i");
 
-      if (from) {
-        const h1 = document.getElementById("headline");
-        h1.textContent = "";
-        const name = document.createElement("span");
-        name.className = "name";
-        name.textContent = from;
-        h1.appendChild(name);
-        h1.appendChild(document.createTextNode(" invited you to their Orbit"));
-
-        document.getElementById("subtext").textContent =
-          "Add " + from + " on Orbit — it makes it easier to casually meet up with friends.";
-        document.title = from + " invited you to Orbit";
-      }
-
-      const cta = document.getElementById("cta");
-      if (APP_URL) {
-        cta.setAttribute("href", APP_URL);
+    function initials(name) {
+      const parts = (name || "").trim().split(/\s+/).filter(Boolean);
+      if (!parts.length) return "·";
+      return (parts[0][0] + (parts[1]?.[0] || "")).toUpperCase();
+    }
+    // Stable warm hue from the name, mirroring the app's avatar coloring.
+    function hueFor(name) {
+      let h = 0;
+      for (const ch of (name || "Village")) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+      return h % 360;
+    }
+    function paintAvatar(name, url) {
+      const el = $("avatar");
+      if (url) {
+        el.style.background = "var(--accent-soft)";
+        el.innerHTML = `<img src="${url}" alt="" style="width:100%;height:100%;object-fit:cover" />`;
       } else {
-        cta.addEventListener("click", function (e) {
-          e.preventDefault();
-          document.getElementById("soon").classList.add("show");
-        });
+        el.style.background = `hsl(${hueFor(name)} 45% 55%)`;
+        el.textContent = initials(name);
       }
-    })();
+    }
+
+    function renderInvited(name, avatarURL) {
+      document.title = `${name} added you to their Village`;
+      paintAvatar(name, avatarURL);
+      $("title").textContent = `${name} added you to their Village`;
+      $("sub").textContent = `You're already in ${name}'s village. Get the app and you'll be connected the moment you sign up with this number.`;
+      $("cta").textContent = "Get Village";
+      $("foot").textContent = "Free to join. Village is how friends keep up with each other and make plans.";
+    }
+
+    function renderGeneric() {
+      document.title = "Join Village";
+      paintAvatar("Village", null);
+      $("avatar").style.background = "var(--ink1)";
+      $("avatar").textContent = "·";
+      $("title").textContent = "Join your friend on Village";
+      $("sub").textContent = "Village is how friends keep up with each other and make plans. Get the app to get started.";
+      $("cta").textContent = "Get Village";
+      $("foot").textContent = "Free to join.";
+    }
+
+    // --- Main ---------------------------------------------------------------
+    $("cta").href = APP_STORE_URL;
+
+    async function load() {
+      if (!token) { renderGeneric(); return; }
+      $("card").classList.add("skeleton");
+      try {
+        const res = await fetch(`${SUPABASE_URL}/functions/v1/invite-info`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": SUPABASE_ANON_KEY,
+            "Authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({ token }),
+        });
+        const data = await res.json();
+        $("card").classList.remove("skeleton");
+        if (data && data.found && data.inviter) {
+          renderInvited(data.inviter.name, data.inviter.avatarURL);
+        } else {
+          renderGeneric();
+        }
+      } catch (_) {
+        $("card").classList.remove("skeleton");
+        renderGeneric();
+      }
+    }
+    load();
   </script>
 </body>
 </html>

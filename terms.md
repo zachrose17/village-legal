@@ -2,11 +2,11 @@
 
 **Last updated: May 28, 2026**
 
-These Terms of Service ("Terms") govern your use of the Orbit mobile application (the "App"), operated by Orbit ("we", "us", or "our"). By creating an account or using the App, you agree to these Terms. If you do not agree, do not use the App.
+These Terms of Service ("Terms") govern your use of the Village mobile application (the "App"), operated by Village ("we", "us", or "our"). By creating an account or using the App, you agree to these Terms. If you do not agree, do not use the App.
 
 ## 1. Eligibility
 
-You must be at least 13 years old to use Orbit. By using the App, you represent that you meet this requirement. If you are under 18, you represent that you have your parent or legal guardian's permission to use the App.
+You must be at least 13 years old to use Village. By using the App, you represent that you meet this requirement. If you are under 18, you represent that you have your parent or legal guardian's permission to use the App.
 
 ## 2. Your Account
 
@@ -19,13 +19,13 @@ You agree to notify us immediately if you suspect unauthorized use of your accou
 
 ## 3. User Content
 
-Orbit allows you to create, post, and share content including broadcasts, replies, profile information, and photos ("User Content"). You retain ownership of your User Content. By posting User Content, you grant Orbit a worldwide, non-exclusive, royalty-free license to host, store, display, and distribute that content within the App, solely as necessary to operate the App and deliver it to your intended audience.
+Village allows you to create, post, and share content including broadcasts, replies, profile information, and photos ("User Content"). You retain ownership of your User Content. By posting User Content, you grant Village a worldwide, non-exclusive, royalty-free license to host, store, display, and distribute that content within the App, solely as necessary to operate the App and deliver it to your intended audience.
 
 You are solely responsible for your User Content and the consequences of posting it.
 
 ## 4. Prohibited Conduct
 
-You agree not to use Orbit to:
+You agree not to use Village to:
 
 - Post or share content that is unlawful, harmful, threatening, abusive, harassing, defamatory, vulgar, obscene, hateful, or otherwise objectionable.
 - Impersonate any person or entity, or misrepresent your affiliation with a person or entity.
@@ -58,11 +58,11 @@ You may delete your account at any time from the You tab within the App. Deletio
 
 The App is provided "as is" and "as available," without warranties of any kind, express or implied, including warranties of merchantability, fitness for a particular purpose, or non-infringement. We do not warrant that the App will be uninterrupted, secure, or error-free.
 
-User Content posted by other users does not reflect the views of Orbit. We are not responsible for the conduct of any user, on or off the App.
+User Content posted by other users does not reflect the views of Village. We are not responsible for the conduct of any user, on or off the App.
 
 ## 8. Limitation of Liability
 
-To the maximum extent permitted by law, Orbit and its officers, employees, and affiliates will not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits or data, arising out of or related to your use of the App.
+To the maximum extent permitted by law, Village and its officers, employees, and affiliates will not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits or data, arising out of or related to your use of the App.
 
 Our total liability to you for any claim arising out of or relating to these Terms or the App will not exceed one hundred US dollars ($100).
 

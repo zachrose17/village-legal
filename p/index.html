@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Join us on Village</title>
+  <title>A plan on Village</title>
 
-  <!-- Link unfurl (static — GitHub Pages can't render per-link previews). -->
-  <meta property="og:title" content="Join us on Village" />
-  <meta property="og:description" content="Tap to sign up — everyone who joins from this link gets connected." />
+  <!-- Link unfurl (static — GitHub Pages can't render per-plan previews). -->
+  <meta property="og:title" content="A plan on Village" />
+  <meta property="og:description" content="Tap in — see who's going and join the plan." />
   <meta property="og:type" content="website" />
 
   <style>
@@ -19,6 +19,7 @@
       --ink3: #9a8f83;
       --hair: rgba(43, 38, 34, 0.10);
       --accent: #3478c4;
+      --broadcast: #b4612f;
     }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html, body { margin: 0; padding: 0; }
@@ -65,15 +66,19 @@
       font-size: 26px; font-weight: 600; color: var(--ink2);
     }
     .host { font-size: 14px; color: var(--ink2); margin: 0 0 4px; }
-    .circle {
+    .activity {
       font-size: 23px; font-weight: 600; line-height: 1.25;
-      color: var(--ink1); margin: 0 0 10px;
+      color: var(--broadcast); margin: 0 0 10px;
     }
-    .members {
+    .when {
+      font-size: 15px; font-weight: 600; color: var(--ink2);
+      margin: 0 0 6px;
+    }
+    .going {
       font-size: 13px; color: var(--ink3); margin: 0 0 24px;
       min-height: 16px;
     }
-    .closed {
+    .ended {
       font-size: 13px; font-weight: 600; color: var(--ink3);
       background: rgba(43,38,34,0.06); border-radius: 999px;
       display: inline-block; padding: 5px 12px; margin-bottom: 18px;
@@ -86,7 +91,7 @@
       transition: transform 0.08s ease;
     }
     .btn:active { transform: scale(0.985); }
-    .btn-primary { background: var(--ink1); color: #fff; margin-bottom: 10px; }
+    .btn-primary { background: var(--broadcast); color: #fff; margin-bottom: 10px; }
     .btn-secondary {
       background: transparent; color: var(--ink2);
       border: 1px solid var(--hair);
@@ -98,16 +103,17 @@
   <main class="card">
     <div class="wordmark">Village</div>
     <div id="avatar" class="avatar initials">·</div>
-    <p class="host" id="host">A friend invited you to join their circle</p>
-    <p class="circle" id="circle">Join the group on Village</p>
-    <p class="members" id="members"></p>
-    <div id="closed" class="closed" style="display:none;">This link is closed</div>
+    <p class="host" id="host">A friend invited you to a plan</p>
+    <p class="activity" id="activity">A plan on Village</p>
+    <p class="when" id="when"></p>
+    <p class="going" id="going"></p>
+    <div id="ended" class="ended" style="display:none;">This plan has ended</div>
 
     <a class="btn btn-primary" id="open" href="#">Open in Village</a>
     <a class="btn btn-secondary" id="get" href="#">Get Village</a>
 
-    <p class="footnote">If you have Village, this opens the app and connects you with
-      the group. Otherwise, download it first — then open this link again.</p>
+    <p class="footnote">If you have Village, this opens the plan so you can tap in.
+      Otherwise, download it first — then open this link again.</p>
   </main>
 
   <script>
@@ -118,13 +124,15 @@
 
     const SUPABASE_URL = "https://bwjebaulfmwnettkdhcw.supabase.co";
     // The anon public key is safe to ship in a client — RLS (not this key)
-    // protects data, and group-invite-info returns only display-safe fields.
+    // protects data, and plan-info returns only display-safe fields.
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ3amViYXVsZm13bmV0dGtkaGN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5OTQ4MTgsImV4cCI6MjA5NDU3MDgxOH0.uqz7sVvhUZVDeZNcL3HUJMXW6dAc3hi125D6T9DeutA";
 
     // ── Read the link ─────────────────────────────────────────────────────
     const params = new URLSearchParams(location.search);
-    const inviteId = params.get("g") || params.get("id");
-    const previewLabel = params.get("n");   // group label, e.g. "College crew"
+    const planId = params.get("b") || params.get("id");
+    const previewTitle = params.get("t");   // "<host> <activity>"
+    const previewWhen  = params.get("w");
+    const previewHost  = params.get("h");
 
     const $ = (id) => document.getElementById(id);
     function escapeHtml(s) {
@@ -134,11 +142,13 @@
 
     // App + store buttons.
     $("get").href = GET_APP_URL;
-    const appUrl = inviteId ? "village://join?g=" + encodeURIComponent(inviteId) : null;
+    const appUrl = planId ? "village://plan?id=" + encodeURIComponent(planId) : null;
     $("open").href = appUrl || GET_APP_URL;
 
     // ── Immediate preview from the link's own params ──────────────────────
-    if (previewLabel) $("circle").textContent = previewLabel;
+    if (previewHost) $("host").textContent = previewHost + " invited you to a plan";
+    if (previewTitle) $("activity").textContent = previewTitle;
+    if (previewWhen) $("when").textContent = previewWhen;
 
     function setInitials(name) {
       const a = $("avatar");
@@ -146,53 +156,50 @@
       a.className = "avatar initials";
       a.textContent = initials || "·";
     }
+    setInitials(previewHost);
 
-    // ── Enrich from group-invite-info (creator, count, label, open/closed) ─
+    // ── Enrich from plan-info (avatar, going count, ended, fresh copy) ─────
     async function enrich() {
-      if (!inviteId) return;
+      if (!planId) return;
       try {
-        const res = await fetch(SUPABASE_URL + "/functions/v1/group-invite-info", {
+        const res = await fetch(SUPABASE_URL + "/functions/v1/plan-info", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             "apikey": SUPABASE_ANON_KEY,
             "Authorization": "Bearer " + SUPABASE_ANON_KEY,
           },
-          body: JSON.stringify({ id: inviteId }),
+          body: JSON.stringify({ id: planId }),
         });
         if (!res.ok) return;
         const data = await res.json();
         if (!data || data.found === false) return;
 
-        const creatorName = data.creator && data.creator.name ? data.creator.name : "A friend";
-        $("host").textContent = creatorName + " invited you to join their circle";
+        const hostName = data.host && data.host.name ? data.host.name : (previewHost || "A friend");
+        $("host").textContent = hostName + " invited you to a plan";
+        if (data.activity) $("activity").textContent = hostName + " " + data.activity;
+        if (data.whenLabel) $("when").textContent = data.whenLabel;
 
-        const label = data.label || previewLabel;
-        if (label) {
-          $("circle").textContent = label;
-        } else {
-          $("circle").textContent = "Join " + creatorName + " on Village";
-        }
-
-        if (data.creator && data.creator.avatarURL) {
+        if (data.host && data.host.avatarURL) {
           const img = document.createElement("img");
           img.className = "avatar";
-          img.src = data.creator.avatarURL;
-          img.alt = escapeHtml(creatorName);
-          img.onerror = () => setInitials(creatorName);
+          img.src = data.host.avatarURL;
+          img.alt = escapeHtml(hostName);
+          img.onerror = () => setInitials(hostName);
           $("avatar").replaceWith(img);
           img.id = "avatar";
         } else {
-          setInitials(creatorName);
+          setInitials(hostName);
         }
 
-        if (typeof data.memberCount === "number" && data.memberCount > 0) {
-          $("members").textContent = data.memberCount === 1
-            ? "1 person is already in" : data.memberCount + " people are already in";
+        if (typeof data.goingCount === "number" && data.goingCount > 0) {
+          $("going").textContent = data.goingCount === 1
+            ? "1 person is going" : data.goingCount + " people are going";
         }
 
-        if (data.open === false) {
-          $("closed").style.display = "inline-block";
+        if (data.ended) {
+          $("ended").style.display = "inline-block";
+          $("open").textContent = "Open in Village";
         }
       } catch (_) { /* best-effort; the param preview already rendered */ }
     }

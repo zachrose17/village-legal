@@ -1,6 +1,6 @@
-# Orbit
+# Village
 
-See your friends more.
+The app for your inner circle.
 
 - [Privacy Policy](./privacy.html)
 - [Terms of Service](./terms.html)

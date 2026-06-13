@@ -1,3 +1,6 @@
-title: Orbit
-description: See your friends more
+title: Village
+description: The app for your inner circle
 theme: jekyll-theme-cayman
+
+include:
+  - ".well-known"

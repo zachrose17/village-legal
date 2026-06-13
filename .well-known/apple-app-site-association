@@ -1,0 +1,11 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "BAS5F2A383.com.zachrose.village",
+        "paths": [ "/p/*", "/g/*", "/add/*", "/invite/*" ]
+      }
+    ]
+  }
+}
